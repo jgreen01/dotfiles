@@ -1,1 +1,241 @@
-/home/jon/Dropbox/useful_commands
+#ffmpeg -- a powerful video/audio converter
+	#--notes--
+		Doesn't do a good job converting files to ogg. (use oggenc)
+
+		-sameq
+			same quality
+
+	#strip sound from a video
+		ffmpeg -i "foo.mp4" -f ogg -sameq -vn foo.ogg
+
+	#convert sound to different format
+		ffmpeg -i "foo.wav" -f ogg -sameq foo.ogg
+
+#wget -- download only
+	#--notes--
+
+		-A and -R
+			accept/reject pattern. You can use *, ?, [ or ]
+			Ex: -A *.foo,*bar* -R evilfile,whatever[12345]
+
+		-m
+			same as -r -N -l inf --no-remove-listing
+
+		-nc OR --no-clobber
+			can't be used with -N
+
+		--cut-dir=#
+			removes # of directorys from download
+
+		-nH OR --no-host-directories
+			removes the host dir
+
+	#to download a perfect copy of a webpage
+		wget -pk - e robots=off --random-wait foo.bar.com
+
+	#to download all the .foo from a website
+		wget -r -nH -e robots=off -A .foo foo.bar.com
+		wget -r -nH -e robots=off -A .foo foo.bar.com
+
+	#to mirror a website
+		wget -nH -nc -S -r -l inf --random-wait --no-remove-listing foo.bar.com
+
+	#to mirror a website from mdlug
+		wget -r -nc -p --html-extension --convert-links --restrict-file-names=windows --domains website.org --no-parent foo.bar.com
+
+	#to mirror tpb
+		wget -rxSkpH -l inf --no-remove-listing -e robots=off --random-wait -a alltpb.log -nc -Dthepiratebay.org http://thepiratebay.org/
+
+#espeak -- convert text files to wav sound files
+	#--notes--
+		The wav file made by this can be very large. Using ffmpeg to
+		change it into mp3 or another compressed format is a good idea.
+		Though quality is less but it doesn't really matter cause it
+		doesn't sound good anyways.
+
+		Good for making Ebooks into audiobooks for listening to 
+		books while driving. gutenberg.org & gutenberg.net.au FTW
+
+	#makes a wav file that reads at 370 words/min in an male US accent
+		espeak -s 370 -p 40 -v english-us -f some.txt -w some.wav
+
+#find -- finds things
+
+	#finds accessed in somedir after somefile was accessed
+		find /somedir -anewer /somefile
+
+#pdftk -- manipulates PDF files
+	#--notes--
+		This command is very confusing. Doesn't use the simple command
+		dash operation <file> structure.
+
+	#removes all retrictions on PDF files
+		pdftk anal_bitch.pdf output happy.pdf allow Allfeatures
+
+	#Join in1.pdf and in2.pdf into a new PDF, out1.pdf
+        	pdftk in1.pdf in2.pdf cat output out1.pdf
+
+#ln -- makes links
+
+	#make symbolic link
+		ln -s file link
+
+# auto convert pdf to audio
+	pdftotext some.pdf - | espeak -s 300 -p 40 -v english-us --stdout --stdin | oggenc - -o some.ogg
+
+#nmap
+
+	#--notes--
+
+		--spoof-mac
+			spoof mac address of scan
+
+		--traceroute
+			trace hop path to each host
+
+		-sS
+			stealth SYN scan
+
+		--data-length <num>
+			append random data to sent packets
+
+		-f
+			fragments packets into 8byte segments
+
+		-D
+			decoy IP addresses
+			using RND:5 uses 5 real random ip's that are on the network
+			,ME is your ip? but if you have 6 different ip's before that you won't be logged?
+
+		-v
+			increase verbosity level (use twice for more effect)
+
+		-n
+			No DNS resolution
+			just gives you the ip's no names
+
+		-O
+			OS detection
+
+		-sV
+			version scan
+			the version of the program running on port
+
+		-oA
+			output scan results in normal, XML, and grepable formats
+			A means all
+
+		-p <ports>
+			T:tcp scan only
+
+	#great nmap scan (w/e it means xD)
+		sudo nmap --spoof-mac Apple --traceroute --data-length 9 -f -D 192.168.200.200,RND:5,ME -v -n -O -sS -sV -oA /home/something/192.168.1.1 --log-errors -append-output -p T:1-1024,1433,2222,2249,7778,8080,9999 -randomize-hosts 192.168.1.1 192.168.1.2
+
+# yaourt -- arch AUR package manager
+
+	# update all packages including AUR
+		yaourt -Syua
+
+# pacman -- arch (pac)kage (man)ager
+
+	# removed package cache (/var/cache/pacman/pkg)
+		pacman -Scc
+
+	# remove package and depends
+		pacman -Rs <package>
+
+	# remove package and all unneeded dependencies (safe way)
+		pacman -Runs <package>
+
+	# package info
+		pacman -Si <package>
+
+	# search
+		pacman -Ss <search>
+
+	# install
+		# from repos
+			pacman -S <package>
+		# from file
+			pacman -U <file>
+
+	# upgrade system
+		pacman -Suy
+
+	# upgrade system with forced refresh of all packages even if they seem to be up to date
+		pacman -Syyu
+
+	# sync with repos
+		pacman -Sy
+
+# adding swap space (with a swap file)
+
+	# dd file (1024 * 512MB = 524288) == (512MB)
+		dd if=/dev/zero of=/swapfile1 bs=1024 count=524288
+
+	# mkfs
+		mkswap /swapfile1
+
+	# turn on (of course...)
+		swapon /swapfile1
+
+# dropbox / grunt fix (linux)
+
+	echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+
+# git workflow
+
+	# clone
+		git clone <url>
+
+	# create branch
+		git checkout -b <name>
+
+	# add code
+		git add -A
+
+	# commit code to branch
+		git commit -am <message>
+
+	# push code to remote
+		git push origin <branch>
+
+	# To undo a revert or really anything (use with caution).
+		git reset --hard HEAD^
+
+	# To see changes in staged content.
+		git diff --cached
+
+	# To see what was changed in the current commit.
+		git show
+
+	# To set back changes in a single directory.
+		git checkout <branch> *
+	or	git checkout -- * // didn't test this one
+
+#grep
+
+	# search all files with a specific file name
+		grep -rl '<pattern in file>' * | grep -e '<file name patter>'
+
+	# use more powerful expressions using perl regex
+		-P
+
+		# example: searchs for 'foo' while excluding 'bar'
+			grep -P '(?!.*bar)foo' *
+
+#nmcli 
+
+	# list of wifi access points
+		nmcli d wifi list
+
+	# connect to an access point
+		nmcli d wifi connect "<ssid>"
+
+#xcalib
+
+	# invert screen colors
+		xcalib -i -a
+
+	# invert screen colors on second monitor
+		xcalib -s 1 -i -a
